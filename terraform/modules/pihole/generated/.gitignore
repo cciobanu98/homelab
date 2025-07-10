@@ -1,0 +1,4 @@
+# Ignore generated DNS files
+custom.list
+*.list
+*.tmp 

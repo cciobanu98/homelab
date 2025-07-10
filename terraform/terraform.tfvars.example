@@ -1,0 +1,173 @@
+# Tailscale Configuration
+tailscale_auth_key = "tskey-auth-your-key-here"
+
+# SSH Configuration (choose one method)
+ssh_private_key = "~/.ssh/id_rsa"      # Recommended: SSH key
+# ssh_password = "your-password"        # Alternative: Password
+
+# Proxmox hosts for Tailscale installation
+machines = [
+  {
+    name     = "server1"
+    ip       = "192.168.100.10"
+    username = "root"
+  },
+  {
+    name     = "server2"
+    ip       = "192.168.100.20"
+    username = "root"
+  }
+]
+
+# Proxmox API Configuration
+proxmox_api_url          = "https://192.168.100.10:8006/api2/json"
+proxmox_api_token_id     = "root@pam!terraform"
+proxmox_api_token_secret = "your-api-token-secret-here"
+proxmox_tls_insecure     = true
+
+# Pi-hole Configuration
+pihole_config = {
+  enabled      = true
+  target_node  = "server1"
+  vmid         = 200
+  hostname     = "pihole"
+  memory       = 1024
+  cores        = 2
+  disk_size    = "8G"
+  ip_address   = "192.168.100.200"
+  gateway      = "192.168.100.1"
+  password     = "your-pihole-password"
+}
+
+pihole_admin_password = "secure-admin-password"
+
+# Custom DNS records for local domains
+custom_dns_records = [
+  {
+    hostname = "server1.home"
+    ip       = "192.168.100.10"
+  },
+  {
+    hostname = "server2.home"
+    ip       = "192.168.100.20"
+  },
+  {
+    hostname = "pihole.home"
+    ip       = "192.168.100.200"
+  },
+  {
+    hostname = "k8s.home"
+    ip       = "192.168.100.100"
+  }
+]
+
+# Talos Kubernetes Cluster Configuration (SIMPLIFIED)
+talos_cluster_name     = "homelab"
+talos_cluster_endpoint = "https://192.168.100.100:6443"  # Load balancer or VIP for control plane
+talos_iso             = "local:iso/talos-amd64.iso"      # Download from https://github.com/siderolabs/talos/releases
+talos_network_bridge  = "vmbr0"
+talos_storage_pool    = "local"
+talos_pod_cidr        = "10.244.0.0/16"
+talos_service_cidr    = "10.96.0.0/12"
+
+# Control plane nodes (minimum 1, recommended 3 for HA)
+# Only required fields: name, target_node, vmid, ip_address
+# Optional fields: memory (default 4GB), cores (default 4), disk_size (default 40G)
+talos_control_plane_nodes = [
+  {
+    name        = "k8s-cp-01"
+    target_node = "server1"
+    vmid        = 300
+    ip_address  = "192.168.100.100"
+    # memory, cores, disk_size will use defaults (4GB, 4 cores, 40G)
+  },
+  {
+    name        = "k8s-cp-02"
+    target_node = "server2"
+    vmid        = 301
+    ip_address  = "192.168.100.101"
+    memory      = 6144  # Optional: override default with 6GB
+    cores       = 6     # Optional: override default with 6 cores
+  },
+  {
+    name        = "k8s-cp-03"
+    target_node = "server1"
+    vmid        = 302
+    ip_address  = "192.168.100.102"
+    disk_size   = "60G"  # Optional: override default with 60G
+  }
+]
+
+# Worker nodes (optional - control plane nodes can run workloads in small clusters)
+# Only required fields: name, target_node, vmid, ip_address
+# Optional fields: memory (default 8GB), cores (default 6), disk_size (default 100G)
+talos_worker_nodes = [
+  {
+    name        = "k8s-worker-01"
+    target_node = "server1"
+    vmid        = 310
+    ip_address  = "192.168.100.110"
+    # memory, cores, disk_size will use defaults (8GB, 6 cores, 100G)
+  },
+  {
+    name        = "k8s-worker-02"
+    target_node = "server2"
+    vmid        = 311
+    ip_address  = "192.168.100.111"
+    memory      = 16384  # Optional: override default with 16GB
+    cores       = 8      # Optional: override default with 8 cores
+    disk_size   = "200G" # Optional: override default with 200G
+  }
+]
+
+# Simple Examples:
+# 
+# Minimal single-node cluster (control plane only):
+# talos_control_plane_nodes = [
+#   {
+#     name        = "k8s-single"
+#     target_node = "server1"
+#     vmid        = 300
+#     ip_address  = "192.168.100.100"
+#   }
+# ]
+# talos_worker_nodes = []
+#
+# Three-node cluster with custom specs:
+# talos_control_plane_nodes = [
+#   {
+#     name        = "k8s-cp-01"
+#     target_node = "server1"
+#     vmid        = 300
+#     ip_address  = "192.168.100.100"
+#     memory      = 8192
+#     cores       = 8
+#     disk_size   = "80G"
+#   },
+#   {
+#     name        = "k8s-cp-02"
+#     target_node = "server2"
+#     vmid        = 301
+#     ip_address  = "192.168.100.101"
+#     memory      = 8192
+#     cores       = 8
+#     disk_size   = "80G"
+#   },
+#   {
+#     name        = "k8s-cp-03"
+#     target_node = "server1"
+#     vmid        = 302
+#     ip_address  = "192.168.100.102"
+#     memory      = 8192
+#     cores       = 8
+#     disk_size   = "80G"
+#   }
+# ]
+
+# Notes:
+# 1. Download Talos ISO from: https://github.com/siderolabs/talos/releases
+# 2. Upload the ISO to your Proxmox storage (typically 'local' storage)
+# 3. Most fields are now optional with sensible defaults
+# 4. Only specify memory, cores, disk_size if you need to override defaults
+# 5. For production, use odd numbers of control plane nodes (1, 3, 5, etc.)
+# 6. Worker nodes are optional - control plane nodes can run workloads in small clusters 
