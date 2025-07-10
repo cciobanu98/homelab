@@ -151,14 +151,9 @@ resource "null_resource" "pihole_setup" {
       # Basic connectivity test
       "echo '✅ SSH connection successful! Starting Pi-hole installation...'",
       
-      # Update system
+      # Update system and install essentials
       "apt-get update",
-      
-      # Install essential packages including web server
-      "DEBIAN_FRONTEND=noninteractive apt-get install -y curl wget sudo systemd lighttpd php-cgi",
-      
-      # Pre-configure lighttpd for Pi-hole
-      "systemctl stop lighttpd || true",
+      "DEBIAN_FRONTEND=noninteractive apt-get install -y curl wget sudo systemd",
       
       # Create Pi-hole setup variables file for unattended install
       "mkdir -p /etc/pihole",
@@ -198,43 +193,17 @@ resource "null_resource" "pihole_setup" {
       "  cp /tmp/custom.list /etc/pihole/custom.list",
       "  chown root:root /etc/pihole/custom.list",
       "  chmod 644 /etc/pihole/custom.list",
+      "  pihole restartdns",
       "else",
       "  echo 'No custom DNS records to deploy'",
       "  touch /etc/pihole/custom.list",
       "fi",
       
-      # Configure and start web server
-      "systemctl enable lighttpd",
-      "systemctl start lighttpd",
-      
-      # Start and enable Pi-hole services
-      "systemctl enable pihole-FTL",
-      "systemctl start pihole-FTL",
-      
-      # Restart Pi-hole to reload custom DNS and web interface
-      "pihole restartdns",
-      "systemctl restart lighttpd",
-      
-      # Install Tailscale
-      "curl -fsSL https://tailscale.com/install.sh | sh",
-      "tailscale up --authkey='${var.tailscale_auth_key}' --hostname='${var.pihole_config.hostname}' --accept-dns=false",
-      "systemctl enable tailscaled",
-      
-      # Final status check
+      # Simple completion message
       "echo '✅ Pi-hole installation completed!'",
       "echo 'Web Interface: http://${var.pihole_config.ip_address}/admin'",
       "echo 'DNS Server: ${var.pihole_config.ip_address}'",
-      "echo 'Custom DNS records: $(wc -l < /etc/pihole/custom.list) entries'",
-      
-      # Verify services are running
-      "systemctl is-active lighttpd && echo '✅ Web server: Running' || echo '❌ Web server: Failed'",
-      "systemctl is-active pihole-FTL && echo '✅ Pi-hole FTL: Running' || echo '❌ Pi-hole FTL: Failed'",
-      "systemctl is-active tailscaled && echo '✅ Tailscale: Running' || echo '❌ Tailscale: Failed'",
-      
-      # Check if web interface is accessible
-      "timeout 10 curl -s http://localhost/admin/ > /dev/null && echo '✅ Web interface: Accessible' || echo '⚠️  Web interface: Check manually'",
-      
-      "pihole status || echo 'Pi-hole status check completed'"
+      "echo 'Custom DNS records: $(wc -l < /etc/pihole/custom.list) entries'"
     ]
   }
 

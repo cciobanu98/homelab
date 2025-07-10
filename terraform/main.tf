@@ -39,23 +39,23 @@ module "pihole" {
   pihole_admin_password      = var.pihole_admin_password
   custom_dns_records = [
     {
-      hostname = "server1.local"
+      hostname = "server1.lab"
       ip       = "192.168.100.10"
     },
     {
-      hostname = "server2.local"
+      hostname = "server2.lab"
       ip       = "192.168.100.20"
     },
     {
-      hostname = "pihole.local"
+      hostname = "pihole.lab"
       ip       = "192.168.100.200"
     },
     {
-      hostname = "k8s.local"
+      hostname = "k8s.lab"
       ip       = "192.168.100.100"
     },
     {
-      hostname = "*.k8s.local"
+      hostname = "*.k8s.lab"
       ip       = "192.168.100.223"
     }
   ]
