@@ -55,7 +55,7 @@ module "pihole" {
       ip       = "192.168.100.100"
     },
     {
-      hostname = "*.k8s.lab"
+      hostname = "apps.lab"
       ip       = "192.168.100.223"
     }
   ]

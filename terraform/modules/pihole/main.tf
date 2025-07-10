@@ -187,17 +187,23 @@ resource "null_resource" "pihole_setup" {
       # Set Pi-hole admin password
       "pihole -a -p '${var.pihole_admin_password}'",
       
-      # Deploy custom DNS records
+      # Deploy custom DNS records (Pi-hole method)
       "if [ -f /tmp/custom.list ] && [ -s /tmp/custom.list ]; then",
       "  echo 'Deploying custom DNS records...'",
+      "  # Copy to Pi-hole custom DNS location",
       "  cp /tmp/custom.list /etc/pihole/custom.list",
       "  chown root:root /etc/pihole/custom.list",
       "  chmod 644 /etc/pihole/custom.list",
-      "  pihole restartdns",
+      "  # Also add to dnsmasq configuration for better integration",
+      "  echo 'addn-hosts=/etc/pihole/custom.list' >> /etc/dnsmasq.d/01-pihole.conf",
+      "  echo 'Custom DNS records deployed:'",
+      "  cat /etc/pihole/custom.list",
       "else",
       "  echo 'No custom DNS records to deploy'",
       "  touch /etc/pihole/custom.list",
       "fi",
+      "# Restart DNS services to apply changes",
+      "pihole restartdns",
       
       # Simple completion message
       "echo '✅ Pi-hole installation completed!'",
