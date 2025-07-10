@@ -136,7 +136,7 @@ module "flux" {
 
   depends_on = [module.talos]
 
-  
+  target_path = "flux/clusters"
   github_token      = var.github_token
   github_owner      = "cciobanu98"
   github_repository = "homelab"
