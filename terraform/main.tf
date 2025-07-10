@@ -1,24 +1,60 @@
 # Tailscale module for all configured Proxmox hosts
 module "tailscale" {
   source = "./modules/tailscale"
-  
+
   tailscale_auth_key = var.tailscale_auth_key
-  machines          = var.machines
-  ssh_private_key   = var.ssh_private_key
-  ssh_password      = var.ssh_password
+  ssh_private_key = var.ssh_private_key
+  machines = [
+    {
+      name     = "server1"
+      ip       = "192.168.100.10"
+      username = "root"
+    },
+    {
+      name     = "server2"
+      ip       = "192.168.100.20"
+      username = "root"
+    }
+  ]
 }
 
 # Pi-hole module for DNS filtering
 module "pihole" {
   source = "./modules/pihole"
-  
-  pihole_config              = var.pihole_config
+
+  pihole_config = {
+    enabled     = true
+    target_node = "server1"
+    vmid        = 200
+    hostname    = "pihole"
+    memory      = 1024
+    cores       = 2
+    disk_size   = "8G"
+    ip_address  = "192.168.100.200"
+    gateway     = "192.168.100.1"
+    password    = var.pihole_password
+  }
   tailscale_auth_key         = var.tailscale_auth_key
   ssh_private_key            = var.ssh_private_key
-  ssh_password               = var.ssh_password
   pihole_admin_password      = var.pihole_admin_password
-  pihole_admin_password_hash = var.pihole_admin_password_hash
-  custom_dns_records         = var.custom_dns_records
+  custom_dns_records = [
+    {
+      hostname = "server1.home"
+      ip       = "192.168.100.10"
+    },
+    {
+      hostname = "server2.home"
+      ip       = "192.168.100.20"
+    },
+    {
+      hostname = "pihole.home"
+      ip       = "192.168.100.200"
+    },
+    {
+      hostname = "k8s.home"
+      ip       = "192.168.100.100"
+    }
+  ]
 }
 
 module "talos" {
@@ -29,13 +65,13 @@ module "talos" {
   }
 
   image = {
-    version = "v1.10.4"
+    version   = "v1.10.4"
     schematic = file("./modules/talos/image/schematic.yaml")
   }
 
   cilium = {
     install = file("./modules/talos/inline-manifests/cilium-install.yaml")
-    values = file("./../kubernetes/cilium/values.yaml")
+    values  = file("./../kubernetes/cilium/values.yaml")
   }
 
   cluster = {
@@ -87,4 +123,24 @@ module "talos" {
       igpu          = false
     }
   }
+}
+
+# Flux GitOps module for cluster management
+module "flux" {
+  count  = 1
+  source = "./modules/flux"
+
+  depends_on = [module.talos]
+
+  github_token      = var.github_token
+  github_owner      = "cciobanu98"
+  github_repository = "homelab"
+  cluster_name      = "homelab-prod"
+  flux_version = "v2.6.0"
+  embedded_manifests = true
+  network_policy     = true
+  components_extra   = [
+    "image-reflector-controller",
+    "image-automation-controller"
+  ]
 }

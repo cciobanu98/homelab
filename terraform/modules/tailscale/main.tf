@@ -15,8 +15,7 @@ resource "null_resource" "tailscale_install" {
     type        = "ssh"
     user        = each.value.username
     host        = each.value.ip
-    private_key = var.ssh_private_key != "" ? file(var.ssh_private_key) : null
-    password    = var.ssh_password != "" ? var.ssh_password : null
+    private_key = file(var.ssh_private_key)
   }
   
   provisioner "remote-exec" {

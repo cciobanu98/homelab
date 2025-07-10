@@ -8,7 +8,7 @@ output "hosts_configured" {
   value       = module.tailscale.hosts_configured
 }
 
-# Pi-hole outputs
+# # Pi-hole outputs
 output "pihole_status" {
   description = "Pi-hole deployment status"
   value       = module.pihole.pihole_status
@@ -33,4 +33,17 @@ output "kube_config" {
   description = "Kubeconfig for the cluster"
   value       = module.talos.kube_config
   sensitive   = true
+}
+
+output "talos_client_configuration" {
+  description = "Kubeconfig for the cluster"
+  value       = module.talos.client_configuration
+  sensitive   = true
+}
+
+
+# Flux GitOps outputs
+output "flux_repository_url" {
+  description = "URL of the GitHub repository used by Flux"
+  value       = module.flux.repository_url
 }

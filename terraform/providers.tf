@@ -59,17 +59,18 @@ provider "kubernetes" {
 # BPG Proxmox provider (for VMs and modern resources)
 provider "proxmox" {
   endpoint = var.proxmox_api_url
-  insecure = var.proxmox_tls_insecure
-  api_token = var.proxmox_api_token
+  insecure = true
+  api_token = "${var.proxmox_api_token_id}=${var.proxmox_api_token_secret}"
   ssh {
-    agent = false
+    username = "root"
+    private_key = file(var.ssh_private_key)
   }
 }
 
 # Telmate Proxmox provider (for LXC containers)
 provider "proxmox-telmate" {
   pm_api_url          = var.proxmox_api_url
-  pm_tls_insecure     = var.proxmox_tls_insecure
+  pm_tls_insecure     = true
   pm_api_token_id     = var.proxmox_api_token_id
   pm_api_token_secret = var.proxmox_api_token_secret
 }

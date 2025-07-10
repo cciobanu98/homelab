@@ -164,10 +164,19 @@ talos_worker_nodes = [
 #   }
 # ]
 
+# Flux GitOps Configuration
+flux_enabled         = true
+github_token         = "ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"  # GitHub Personal Access Token
+github_owner         = "your-github-username"                      # GitHub username or organization
+github_repository    = "homelab-gitops"                           # Repository name for GitOps
+flux_cluster_name    = "homelab"                                  # Cluster name (should match talos_cluster_name)
+
 # Notes:
 # 1. Download Talos ISO from: https://github.com/siderolabs/talos/releases
 # 2. Upload the ISO to your Proxmox storage (typically 'local' storage)
 # 3. Most fields are now optional with sensible defaults
 # 4. Only specify memory, cores, disk_size if you need to override defaults
 # 5. For production, use odd numbers of control plane nodes (1, 3, 5, etc.)
-# 6. Worker nodes are optional - control plane nodes can run workloads in small clusters 
+# 6. Worker nodes are optional - control plane nodes can run workloads in small clusters
+# 7. For Flux: Create a GitHub Personal Access Token with 'repo' permissions
+# 8. Never commit your GitHub token to version control 

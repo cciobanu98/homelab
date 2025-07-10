@@ -40,15 +40,10 @@ resource "proxmox_virtual_environment_vm" "this" {
     ssd          = true
     file_format  = "raw"
     size         = 20
-    #file_id      = proxmox_virtual_environment_download_file.this["${each.value.host_node}_${each.value.update == true ? local.update_image_id : local.image_id}"].id
+    file_id      = proxmox_virtual_environment_download_file.this["${each.value.host_node}_${each.value.update == true ? local.update_image_id : local.image_id}"].id
   }
 
-  cdrom {
-    enabled = true
-    file_id = proxmox_virtual_environment_download_file.this["${each.value.host_node}_${local.image_id}"].id
-  }
-
-  boot_order = ["ide2", "ide3", "scsi0"]
+  boot_order = ["scsi0"]
 
   operating_system {
     type = "l26" # Linux Kernel 2.6 - 6.X.

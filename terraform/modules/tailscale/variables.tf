@@ -19,12 +19,4 @@ variable "ssh_private_key" {
   default     = ""
 }
 
-variable "ssh_password" {
-  description = "SSH password (use only if no SSH key available)"
-  type        = string
-  default     = ""
-  sensitive   = false
-}
-
-
  
