@@ -7,7 +7,7 @@ metadata:
 spec:
   ingressClassName: cilium
   rules:
-  - host: app1.k8s.home
+  - host: app1.k8s.local
     http:
       paths:
       - path: /
