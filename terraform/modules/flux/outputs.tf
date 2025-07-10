@@ -5,17 +5,12 @@ output "repository_name" {
 
 output "repository_url" {
   description = "URL of the GitHub repository"
-  value       = data.github_repository.this[0].html_url
-}
-
-output "repository_clone_url" {
-  description = "Clone URL of the GitHub repository"
-  value       = data.github_repository.this[0].clone_url
+  value       = data.github_repository.this.html_url
 }
 
 output "repository_ssh_clone_url" {
   description = "SSH clone URL of the GitHub repository"
-  value       = data.github_repository.this[0].ssh_clone_url
+  value       = data.github_repository.this.ssh_clone_url
 }
 
 output "flux_path" {

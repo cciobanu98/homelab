@@ -35,6 +35,15 @@ terraform {
       version = "~> 0.11"
     }
 
+    flux = {
+      source = "fluxcd/flux"
+      version = "1.6.4"
+    }
+    
+    github = {
+      source  = "integrations/github"
+      version = ">= 6.1"
+    }
   }
 }
 
@@ -73,4 +82,24 @@ provider "proxmox-telmate" {
   pm_tls_insecure     = true
   pm_api_token_id     = var.proxmox_api_token_id
   pm_api_token_secret = var.proxmox_api_token_secret
+}
+
+provider "github" {
+  token = var.github_token
+}
+
+provider "flux" {
+  kubernetes = {
+    host                   = module.talos.kube_config.kubernetes_client_configuration.host
+    client_certificate     = base64decode(module.talos.kube_config.kubernetes_client_configuration.client_certificate)
+    client_key            = base64decode(module.talos.kube_config.kubernetes_client_configuration.client_key)
+    cluster_ca_certificate = base64decode(module.talos.kube_config.kubernetes_client_configuration.ca_certificate)
+  }
+  git = {
+    url = "https://github.com/cciobanu98/homelab"
+    http = {
+      username = "cciobanu98"
+      password = var.github_token
+    }
+  }
 }

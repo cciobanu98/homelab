@@ -31,15 +31,7 @@ variable "branch" {
   default     = "main"
 }
 
-variable "repository_visibility" {
-  description = "GitHub repository visibility (public or private)"
-  type        = string
-  default     = "private"
-  validation {
-    condition     = contains(["public", "private"], var.repository_visibility)
-    error_message = "Repository visibility must be either 'public' or 'private'."
-  }
-}
+
 
 variable "flux_version" {
   description = "Version of Flux to install"

@@ -127,8 +127,12 @@ module "talos" {
 
 # Flux GitOps module for cluster management
 module "flux" {
-  count  = 1
   source = "./modules/flux"
+
+  providers = {
+    flux   = flux
+    github = github
+  }
 
   depends_on = [module.talos]
 
