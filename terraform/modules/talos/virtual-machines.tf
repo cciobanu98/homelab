@@ -14,7 +14,7 @@ resource "proxmox_virtual_environment_vm" "this" {
   bios          = "seabios"
 
   agent {
-    enabled = true
+    enabled = false
   }
 
   cpu {
@@ -44,6 +44,15 @@ resource "proxmox_virtual_environment_vm" "this" {
   }
 
   boot_order = ["scsi0"]
+
+  lifecycle {
+    ignore_changes = [
+      agent,
+      initialization,
+      # Ignore other common changes that don't require recreation
+      tags,
+    ]
+  }
 
   operating_system {
     type = "l26" # Linux Kernel 2.6 - 6.X.
