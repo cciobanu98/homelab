@@ -6,12 +6,13 @@ metadata:
   namespace: flux-system
 spec:
   interval: 10m0s
-  retryInterval: 1m0s
+  path: ./flux/infrastructure/prod
+  prune: true
+  wait: true
+  force: true
+  targetNamespace: prod
   timeout: 5m0s
   sourceRef:
     kind: GitRepository
     name: flux-system
-  path: ./flux/infrastructure/prod
-  prune: true
-  wait: true
-  validation: client
+  
