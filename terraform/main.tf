@@ -53,6 +53,10 @@ module "pihole" {
     {
       hostname = "k8s.home"
       ip       = "192.168.100.100"
+    },
+    {
+      hostname = "*.k8s.home"
+      ip       = "192.168.100.223"
     }
   ]
 }

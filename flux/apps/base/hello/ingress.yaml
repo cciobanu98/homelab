@@ -4,12 +4,10 @@ metadata:
   name: hello-world
   labels:
     app: hello-world
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
-  ingressClassName: nginx
+  ingressClassName: cilium
   rules:
-  - host: hello.local
+  - host: app1.k8s.home
     http:
       paths:
       - path: /
