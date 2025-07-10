@@ -187,21 +187,13 @@ resource "null_resource" "pihole_setup" {
       # Set Pi-hole admin password
       "pihole -a -p '${var.pihole_admin_password}'",
       
-      # Deploy custom DNS records (Pi-hole method)
-      "if [ -f /tmp/custom.list ] && [ -s /tmp/custom.list ]; then",
-      "  echo 'Deploying custom DNS records...'",
-      "  # Copy to Pi-hole custom DNS location",
-      "  cp /tmp/custom.list /etc/pihole/custom.list",
-      "  chown root:root /etc/pihole/custom.list",
-      "  chmod 644 /etc/pihole/custom.list",
-      "  # Also add to dnsmasq configuration for better integration",
-      "  echo 'addn-hosts=/etc/pihole/custom.list' >> /etc/dnsmasq.d/01-pihole.conf",
-      "  echo 'Custom DNS records deployed:'",
-      "  cat /etc/pihole/custom.list",
-      "else",
-      "  echo 'No custom DNS records to deploy'",
-      "  touch /etc/pihole/custom.list",
-      "fi",
+             # Deploy custom DNS records to Pi-hole's actual location
+       "if [ -f /tmp/custom.list ]; then",
+       "  echo 'Deploying custom DNS records...'",
+       "  # Add records to Pi-hole's custom DNS file at the correct location",
+       "  cat /tmp/custom.list >> /etc/pihole/hosts/custom.list",
+       "  echo 'Custom DNS records added to /etc/pihole/hosts/custom.list'",
+       "fi",
       "# Restart DNS services to apply changes",
       "pihole restartdns",
       
@@ -209,7 +201,7 @@ resource "null_resource" "pihole_setup" {
       "echo '✅ Pi-hole installation completed!'",
       "echo 'Web Interface: http://${var.pihole_config.ip_address}/admin'",
       "echo 'DNS Server: ${var.pihole_config.ip_address}'",
-      "echo 'Custom DNS records: $(wc -l < /etc/pihole/custom.list) entries'"
+      "echo 'Custom DNS records: $(wc -l < /etc/pihole/hosts/custom.list) entries'"
     ]
   }
 
