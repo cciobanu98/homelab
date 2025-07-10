@@ -1,1 +1,2 @@
 terraform state rm module.talos
+terraform plan -refresh=false

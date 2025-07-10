@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+metadata:
+  name: prod-apps
+  namespace: prod
+namespace: prod
+resources:
+  - hello
+commonLabels:
+  environment: prod
+  app.kubernetes.io/part-of: homelab-prod
