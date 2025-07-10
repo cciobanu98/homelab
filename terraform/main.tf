@@ -136,6 +136,7 @@ module "flux" {
 
   depends_on = [module.talos]
 
+  
   github_token      = var.github_token
   github_owner      = "cciobanu98"
   github_repository = "homelab"
