@@ -1,0 +1,36 @@
+controller:
+  service:
+    type: LoadBalancer
+    loadBalancerIP: "192.168.100.220"
+    externalTrafficPolicy: Local
+    
+    annotations: {}
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  
+  replicaCount: 1
+  
+  config:
+    use-forwarded-headers: "true"
+    proxy-body-size: "64m"
+    ssl-redirect: "true"
+
+defaultBackend:
+  enabled: true
+  image:
+    registry: registry.k8s.io
+    image: defaultbackend-amd64
+    tag: "1.5"
+  resources:
+    limits:
+      cpu: 10m
+      memory: 20Mi
+    requests:
+      cpu: 10m
+      memory: 20Mi 
