@@ -20,7 +20,6 @@ spec:
   upgrade:
     remediation:
       retries: 3
-  targetNamespace: ingress-nginx
   valuesFrom:
   - kind: ConfigMap
     name: nginx-values
