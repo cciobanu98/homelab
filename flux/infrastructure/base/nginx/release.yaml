@@ -21,7 +21,6 @@ spec:
     remediation:
       retries: 3
   targetNamespace: ingress-nginx
-  createNamespace: true
   valuesFrom:
   - kind: ConfigMap
     name: nginx-values
