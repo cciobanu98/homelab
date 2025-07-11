@@ -1,2 +1,0 @@
-# This file ensures the generated directory exists for Terraform
-# Generated DNS records will be placed here during terraform plan/apply 

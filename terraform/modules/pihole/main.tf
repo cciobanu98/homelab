@@ -15,15 +15,7 @@ terraform {
   }
 }
 
-# Generate custom DNS records file
-resource "local_file" "custom_dns" {
-  count = var.pihole_config.enabled ? 1 : 0
-  
-  content = templatefile("${path.module}/templates/custom-dns.list.tpl", {
-    dns_records = var.custom_dns_records
-  })
-  filename = "${path.module}/generated/custom.list"
-}
+# No need for custom DNS file anymore - using API directly
 
 # Pi-hole LXC Container
 resource "proxmox_lxc" "pihole" {
@@ -129,7 +121,7 @@ resource "null_resource" "pihole_ssh_setup" {
 resource "null_resource" "pihole_setup" {
   count = var.pihole_config.enabled ? 1 : 0
   
-  depends_on = [null_resource.pihole_ssh_setup, local_file.custom_dns]
+  depends_on = [null_resource.pihole_ssh_setup]
 
   connection {
     type        = "ssh"
@@ -140,14 +132,10 @@ resource "null_resource" "pihole_setup" {
     timeout     = "10m"
   }
 
-  # Upload custom DNS records file
-  provisioner "file" {
-    source      = "${path.module}/generated/custom.list"
-    destination = "/tmp/custom.list"
-  }
+  # No file upload needed - using API directly
 
   provisioner "remote-exec" {
-    inline = [
+    inline = concat([
       # Basic connectivity test
       "echo '✅ SSH connection successful! Starting Pi-hole installation...'",
       
@@ -187,13 +175,14 @@ resource "null_resource" "pihole_setup" {
       # Set Pi-hole admin password
       "pihole -a -p '${var.pihole_admin_password}'",
       
-             # Deploy custom DNS records to Pi-hole's actual location
-       "if [ -f /tmp/custom.list ]; then",
-       "  echo 'Deploying custom DNS records...'",
-       "  # Add records to Pi-hole's custom DNS file at the correct location",
-       "  cat /tmp/custom.list >> /etc/pihole/hosts/custom.list",
-       "  echo 'Custom DNS records added to /etc/pihole/hosts/custom.list'",
-       "fi",
+      # Deploy custom DNS records via Pi-hole API
+      "echo 'Deploying custom DNS records via API...'",
+      "until curl -s http://localhost/admin > /dev/null; do sleep 5; done",
+    ], [
+      for record in var.custom_dns_records : 
+      "curl -X PUT 'http://localhost/api/config/dns/hosts/${record.ip}%20${record.hostname}'"
+    ], [
+      "echo 'Custom DNS records deployed via API'",
       "# Restart DNS services to apply changes",
       "pihole restartdns",
       
@@ -201,8 +190,8 @@ resource "null_resource" "pihole_setup" {
       "echo '✅ Pi-hole installation completed!'",
       "echo 'Web Interface: http://${var.pihole_config.ip_address}/admin'",
       "echo 'DNS Server: ${var.pihole_config.ip_address}'",
-      "echo 'Custom DNS records: $(wc -l < /etc/pihole/hosts/custom.list) entries'"
-    ]
+      "echo 'Custom DNS records: ${length(var.custom_dns_records)} entries'"
+    ])
   }
 
   triggers = {
