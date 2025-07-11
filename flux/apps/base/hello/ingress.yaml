@@ -5,9 +5,9 @@ metadata:
   labels:
     app: hello-world
 spec:
-  ingressClassName: cilium
+  ingressClassName: nginx
   rules:
-  - host: app1.k8s.lab
+  - host: app1.apps.lab
     http:
       paths:
       - path: /
