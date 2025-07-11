@@ -59,4 +59,12 @@ variable "custom_dns_records" {
     ip       = string
   }))
   default = []
-} 
+}
+
+variable "custom_k8s_domain" {
+  description = "Custom DNS records for k8s domain: example: .apps.lab"
+  type = object({
+    hostname = string
+    ip       = string
+  })
+}

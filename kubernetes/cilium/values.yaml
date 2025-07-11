@@ -70,7 +70,7 @@ envoy:
       envoy: [ NET_ADMIN, PERFMON, BPF ]
 
 ingressController:
-  enabled: false
+  enabled: true
 
 hubble:
   enabled: true

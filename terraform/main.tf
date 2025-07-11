@@ -37,6 +37,10 @@ module "pihole" {
   tailscale_auth_key         = var.tailscale_auth_key
   ssh_private_key            = var.ssh_private_key
   pihole_admin_password      = var.pihole_admin_password
+  custom_k8s_domain = {
+    hostname = ".apps.lab"
+    ip       = "192.168.100.220"
+  }
   custom_dns_records = [
     {
       hostname = "server1.lab"
@@ -53,10 +57,6 @@ module "pihole" {
     {
       hostname = "k8s.lab"
       ip       = "192.168.100.100"
-    },
-    {
-      hostname = "apps.lab"
-      ip       = "192.168.100.223"
     }
   ]
 }

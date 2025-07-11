@@ -184,6 +184,11 @@ resource "null_resource" "pihole_setup" {
     ], [
       "echo 'Custom DNS records deployed via API'",
       "# Restart DNS services to apply changes",
+      "echo 'Create wildcard in /etc/dnsmasq.d/wildcards.conf'",
+      "cat > /etc/dnsmasq.d/wildcards.conf << 'EOF'",
+      "address=/${var.custom_k8s_domain.hostname}/${var.custom_k8s_domain.ip}",
+      "EOF", 
+      "pihole-FTL --config misc.etc_dnsmasq_d true",
       "pihole restartdns",
       
       # Simple completion message

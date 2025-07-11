@@ -83,4 +83,4 @@ spec:
       volumes:
         - name: values
           configMap:
-            name: cilium-values
+            name: cilium-values 
